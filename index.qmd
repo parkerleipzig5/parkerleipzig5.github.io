@@ -1,16 +1,16 @@
 ---
-title: "Demo Site" # change this to your name
+title: "Parker Leipzig" # change this to your name
 image: images/linkedin_profile_picture.jpg # change to your profile pic
 about:
   template: jolla # templates: jolla, trestles, solana, marquee, broadside
   links: 
     - icon: envelope
       text: Contact Me
-      href: mailto:yourname@hamline.edu # change to your email
+      href: mailto:pleipzig01@hamline.edu # change to your email
     - icon: linkedin
       href: https://linkedin.com. # change to your linkedin address
     - icon: github
-      href: https://github.com # change to your github address
+      href: https://github.com/parkerleipzig5 # change to your github address
     - icon: twitter
       href: https://twitter.com # change to your twitter address
 ---

@@ -3,7 +3,7 @@ project:
   output-dir: docs
 
 website:
-  title: "Demo Site"
+  title: "Parker Leipzig"
   favicon: images/personal_logo.png
   navbar:
     left:
@@ -17,7 +17,7 @@ website:
         href: resume.qmd
     right: 
       - icon: github
-        href: https://github.com/ # change this to your github url
+        href: https://github.com/parkerleipzig5 # change this to your github url
       - icon: linkedin
         href: https://www.linkedin.com # change this to your linkedin page
       - icon: twitter
@@ -26,7 +26,7 @@ website:
       background: light
       right: 
         - icon: github
-          href: https://github.com/
+          href: https://github.com/parkerleipzig5
         - icon: linkedin
           href: https://linkedin.com/
         - icon: twitter
