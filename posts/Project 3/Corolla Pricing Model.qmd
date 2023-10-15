@@ -1,0 +1,152 @@
+---
+title: "Problem Set 3"
+format: html
+editor: visual
+---
+
+------------------------------------------------------------------------
+## Step 1
+```{r}
+#| message: false
+library(tidyverse)
+library(rpart)
+library(caret)
+library(GGally)
+library(ggthemes)
+library(dplyr)
+library(ggplot2)
+library(rpart.plot)
+library(iml)
+library(rlang)
+library(lubridate)
+library(dummy)
+library(gamlr)
+library(rmarkdown)
+```
+
+## Step 2
+## Read in and Prepare Data
+## There is 1,436 observations and 39 columns. There is 36 numerical types and 3 categorical data types.
+
+```{r}
+cars = read_csv("ToyotaCorolla.csv")
+glimpse(cars)
+```
+
+```{r}
+cars = cars %>%
+  select(-Id, -Model, -Mfg_Month, -Cylinders) %>%
+  rename(Age = Age_08_04)
+```
+
+It helps us if we represent our data in the best way. We can change some of the features to nominal data types or factor data types. It helps us determine if we have any missing data.
+
+```{r}
+cars_fct = cars %>%
+  select(-Price, -Age, -KM, -HP, -CC, -Quarterly_Tax, -Weight) %>%
+  mutate_all(.funs = factor)
+
+cars_num = cars %>%
+  select(Price, Age, KM, HP, CC, Quarterly_Tax, Weight)
+
+cars = bind_cols(cars_num, cars_fct)
+```
+
+There is no missing values for each. 
+
+```{r}
+summary(cars2)
+```
+
+## Step 3
+```{r}
+#| message: false
+#| used log because it was right skewed
+cars2 %>%
+  ggplot(aes(x=log(Price))) + 
+  geom_histogram(aes(y=after_stat(density)),
+                 fill = "aquamarine",
+                 color = "aquamarine3",
+                 alpha = 0.7) +
+  geom_density(color = "black") +
+  labs(title = "LOG Of Price of Average Car",
+       x = "Price (count)") +
+  theme_clean()
+```
+
+```{r}
+lm_Price=train(Price -.,
+               data =cars,
+               method = "lm")
+```
+
+## Step 4
+```{r}
+caret::featurePlot(keep(cars, is.numeric), cars$Price, plot = "scatter")
+```
+
+## Step 5
+```{r}
+set.seed(456)
+samp = caret::createDataPartition(cars2$Price, p = 0.7, list = FALSE)
+train = cars2[samp, ]
+test = cars2[-samp,]
+rm(samp)
+```
+
+```{r}
+cars %>%
+  keep(is.numeric) %>%
+  ggpairs()
+```
+
+
+## Step 6
+```{r}
+cars_dum = dummy(cars, int = TRUE)
+cars_num = cars %>%
+  keep(is.numeric)
+cars = bind_cols(cars_num, cars_dum)
+rm(cars_dum, cars_num)
+```
+
+## Step 7
+```{r}
+train_ctrl = trainControl(method = "repeatedcv", number =20, repeats =10)
+tree = train(Price - .,
+             data= training,
+             method= "rpart",
+             trControl = train_ctrl,
+             tuneGrid= expand.grid(cp = seq(0.0, 0.1, 0.01)))
+control =rpart.control(method = "anova", minsplit =1, minibucket =1)
+```
+
+## Step 8
+```{r}
+lm_model <- lm(Price -., data = cars)
+
+vip::bip(lm_model)
+```
+
+Most important one: KM, Mfg_Year_2001, Automatic
+
+## Step 9
+```{r}
+selected_features <- c("Mfg_Year_2001", "KM")
+
+training_subset <- training[, c(selected_features)]
+
+train_ctrl =trainControl(method = "repeatedcv", number =20, repeats =10)
+tree =train(Price - .,
+            data= training,
+            method= "rpart",
+            trControl = train_ctrl,
+            tuneGrid= expand.grid(cp = seq(0.0, 0.1, 0.01)))
+```
+
+## Step 10
+```{r}
+test_predictions <- predict(tree, cars_fct = testing)
+test_rmse <- sqrt(mean((test_predictions - testing$Price)^2))
+```
+
